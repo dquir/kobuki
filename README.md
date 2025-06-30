@@ -15,7 +15,7 @@ source /opt/ros/humble/setup.bash
 Clone the repository to your workspace:
 ```bash
 cd <ros2-workspace>/src
-git clone https://github.com/IntelligentRoboticsLabs/kobuki.git
+git clone -b humble https://github.com/dquir/kobuki.git
 ```
 
 Prepare your thirparty repos:
