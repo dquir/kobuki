@@ -4,6 +4,7 @@
 ![distro](https://img.shields.io/badge/ROS2-Humble-blue)
 
 This project contains the launchers to run the [Turtlebot2 Kobuki](https://github.com/kobuki-base), both in simulated running different Gazebo worlds, as in the real robot using its drivers.
+It is based on the project of [Intelligent Robotics Lab](https://github.com/IntelligentRoboticsLabs/kobuki)
 
 # Installation on your own computer
 You need to have previously installed ROS2. Please follow this [guide](https://docs.ros.org/en/humble/Installation.html) if you don't have it.
@@ -24,40 +25,31 @@ sudo apt install python3-vcstool python3-pip python3-rosdep python3-colcon-commo
 cd <ros2-workspace>/src/
 vcs import < kobuki/thirdparty.repos
 ```
-*Please make sure that this last command has not failed. If this happens, run it again.*
+> This repo uses the [vcs tool](http://wiki.ros.org/vcstool). It can be installed via apt ```sudo apt install python3-vcs-tool``` or with pip ```pip install -U vcstool```
+>*Please make sure that this last command has not failed. If this happens, run it again.*
 
 ### Install libusb, libftdi & libuvc
 ```bash
 sudo apt install libusb-1.0-0-dev libftdi1-dev libuvc-dev
 ```
 
-### Install udev rules from astra camera, kobuki and rplidar
-When you connect a piece of hardware to your pc, it assigns `/dev/ttyUSB*` to it. This will not have the necessary read/write permissions, so we will not be able to use it correctly. The solution is to set up some udev rules that creates a symlink with another name (example: `/dev/ttyUSB0` -> `/dev/kobuki`) and grants it the necessary permissions.
+### Install third party packages via apt
 ```bash
-cd <ros2-workspace>
-sudo cp src/ThirdParty/ros_astra_camera/astra_camera/scripts/56-orbbec-usb.rules /etc/udev/rules.d/
-sudo cp src/ThirdParty/rplidar_ros/scripts/rplidar.rules /etc/udev/rules.d/
-sudo cp src/ThirdParty/kobuki_ros/60-kobuki.rules /etc/udev/rules.d/
-sudo udevadm control --reload-rules && sudo udevadm trigger
-```
+sudo apt install -y ros-humble-gazebo-ros-pkgs ros-humble-gazebo-plugins
+sudo apt install -y ros-humble-openni2-camera
 
-### Move xtion calibration
-Some cameras need a calibration file where they indicate, for example, their resolution, name, etc...
-```bash
-mkdir -p ~/.ros/camera_info
-cp <ros2-workspace>/src/ThirdParty/openni2_camera/openni2_camera/rgb_PS1080_PrimeSense.yaml ~/.ros/camera_info
 ```
 
 ### Building project
 ```bash
+cd ~/<ros2_workspace>
 sudo rosdep init
 rosdep update
 rosdep install --from-paths src --ignore-src -r -y
-colcon build --symlink-install 
+colcon build --symlink-install --cmake-args -DCMAKE_POLICY_VERSION_MINIMUM=3.5
 ```
 
->  If your terminal has crashed or closed while compiling, please try compiling your packages as follows `colcon build --symlink-install --parallel-workers 1` or do so by selecting the package that failed `colcon build --symlink-install --parallel-workers 1 --packages-select <package>`
-> 
+>  If your terminal has crashed or closed while compiling, please try compiling your packages as follows `colcon build --symlink-install --parallel-workers 1`
 > Also, if you want to prevent it from recompiling that package, add a `COLCON_IGNORE` inside the package
 
 ### Setup Gazebo to find models - GAZEBO_MODEL_PATH and project path
